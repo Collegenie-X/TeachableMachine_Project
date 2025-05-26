@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<!-- saved from url=(0123)https://vutkpgk9d6-496ff2e9c6d22116-0-colab.googleusercontent.com/outputframe.html?vrz=colab_20250514-060044_RC00_758624382 -->
+<html theme="dark" editor="Default Dark" style="overflow-y: auto;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script>
+  // Avoid arrow function syntax to stay ES5 compatible for the sake of googlebot.
+  window.addEventListener("message", function (message) {
+    if (message.source != window.parent) {
+      return;
+    }
+    if (message.data.sandboxed_iframe_evaluation) {
+      // Message is available in scope so evaluated script can get params from
+      // it.
+      window.currentMessage = message;
+      eval.call(null, message.data.sandboxed_iframe_evaluation);
+      delete window.currentMessage;
+    }
+  });
+</script>
+<style>html{--google-orange-600:#e8710a;--google-yellow-600:#f9ab00;--google-blue-600:#1a73e8;--google-blue-700:#1967d2;--paper-amber-50:#fff8e1;--paper-amber-400:#ffca28;--paper-blue-700:#1976d2;--paper-orange-300:#ffb74d;--paper-orange-400:#ffa726;--paper-orange-500:#ff9800;--paper-orange-700:#f57c00;--paper-grey-200:#eee;--paper-grey-300:#e0e0e0;--paper-grey-400:#bdbdbd;--paper-grey-500:#9e9e9e;--paper-grey-600:#757575;--paper-grey-700:#616161;--paper-grey-800:#424242;--paper-red-100:#ffcdd2;--paper-red-900:#b71c1c;--paper-red-a700:#d50000;--md-icon-font:"Google Symbols";--mdc-icon-font:"Google Symbols"}html{--colab-primary-color:#0b57d0;--colab-primary-text-color:#1f1f1f;--colab-secondary-text-color:#444746;--colab-primary-surface-color:#fff;--colab-secondary-surface-color:#f7f7f7;--colab-highlighted-surface-color:var(--paper-grey-200);--colab-border-color:#dadada;--colab-bold-border-color:#747775;--ansi-black:#000;--ansi-red:#8b0000;--ansi-green:#006400;--ansi-yellow:#cdcd00;--ansi-blue:#00e;--ansi-magenta:#cd00cd;--ansi-cyan:#4682b4;--ansi-gray:#e5e5e5;--ansi-bright-black:#7f7f7f;--ansi-bright-red:red;--ansi-bright-green:#00d000;--ansi-bright-yellow:#ff0;--ansi-bright-blue:#5c5cff;--ansi-bright-magenta:#f0f;--ansi-bright-cyan:#0ff;--ansi-bright-gray:#fff;--colab-anchor-color:var(--colab-primary-color);--colab-icon-color:var(--colab-secondary-text-color);--colab-code-font-family:monospace;--colab-chrome-font-family:"Roboto","Noto",sans-serif;--colab-chrome-font-size:14px}html[theme=dark]{--colab-primary-color:#a8c7fa;--colab-primary-text-color:#e3e3e3;--colab-secondary-text-color:#c4c7c5;--colab-primary-surface-color:#383838;--colab-secondary-surface-color:#454545;--colab-highlighted-surface-color:#525252;--colab-border-color:var(--paper-grey-700);--colab-bold-border-color:#c4c7c5;--ansi-black:#3f3f3f;--ansi-red:#ff7a88;--ansi-green:#57bb8a;--ansi-yellow:#ff6;--ansi-blue:#82b1ff;--ansi-magenta:#cd00cd;--ansi-cyan:#99bbd7;--ansi-gray:#e5e5e5;--ansi-bright-green:#0f0}html[theme=dark] body.embedded{--colab-primary-surface-color:#131314;--colab-secondary-surface-color:#202124;--colab-highlighted-surface-color:#202124;--colab-border-color:#3c4043}html[editor=Synthwave84]{--colab-anchor-color:#f97e72;--colab-primary-surface-color:#241b2f;--colab-secondary-surface-color:#49549539;--colab-highlighted-surface-color:#372d4b;--colab-border-color:#34294fb3;--ansi-red:#fe4450;--ansi-green:#72f1b8;--ansi-yellow:#f97e72;--ansi-blue:#03edf9;--ansi-magenta:#ff7edb;--ansi-cyan:#03edf9;--ansi-bright-red:#fe4450;--ansi-bright-green:#72f1b8;--ansi-bright-yellow:#fede5d;--ansi-bright-blue:#03edf9;--ansi-bright-magenta:#ff7edb;--ansi-bright-cyan:#03edf9}html{overflow-y:hidden}body{background:var(--colab-primary-surface-color);color:var(--colab-primary-text-color);font-family:var(--colab-chrome-font-family);font-size:var(--colab-chrome-font-size);line-height:1.24;font-weight:400;padding:7px 0 10px 5px;margin:0}h1,h2,h3,h4,h5,h6{color:var(--colab-primary-text-color);font-family:var(--colab-chrome-font-family);font-weight:700;margin-bottom:4px}p,ul{margin-bottom:6px;margin-top:6px}pre{margin-bottom:0;margin-top:0}a{color:var(--colab-anchor-color)}div.output_text,div.output_text pre,div.stream{display:inline}.execute_result>pre{display:block}.output_latex,.output_markdown{max-width:1016px}.output_markdown table,table.dataframe{border-collapse:collapse;border-spacing:0;border:none;table-layout:fixed}.output_markdown table thead,table.dataframe thead{border-bottom:1px solid var(--colab-border-color);font-family:var(--colab-code-font-family);text-align:right}.output_markdown table td,.output_markdown table th,.output_markdown table tr,table.dataframe td,table.dataframe th,table.dataframe tr{border:none;padding:.5em;white-space:normal}.output_markdown table th,table.dataframe th{font-weight:700}.output_markdown table th.col_heading,table.dataframe th.col_heading{text-align:right}.output_markdown table tbody tr:nth-child(odd),table.dataframe tbody tr:nth-child(odd){background:var(--colab-secondary-surface-color)}.output_markdown table tbody tr:hover,.output_markdown table tbody tr:nth-child(odd):hover,table.dataframe tbody tr:hover,table.dataframe tbody tr:nth-child(odd):hover{background-color:var(--colab-highlighted-surface-color)}.output_markdown table td,table.dataframe td{text-align:right}table.dataTable input.text_filter{width:95%}.output_markdown table th,table.dataTable th{text-align:left}.output_image>img{background-color:#fff;max-width:100%;vertical-align:bottom}.output_image>img.unconstrained{max-width:unset}.ansibold{font-weight:700}.ansiblack{color:#000}.ansired{color:darkred}.ansigreen{color:#006400}.ansiyellow{color:brown}.ansiblue{color:#00008b}.ansipurple{color:#9400d3}.ansicyan{color:#4682b4}.ansigray{color:gray}.ansibgblack{background-color:#000}.ansibgred{background-color:red}.ansibggreen{background-color:green}.ansibgyellow{background-color:#ff0}.ansibgblue{background-color:blue}.ansibgpurple{background-color:#f0f}.ansibgcyan{background-color:cyan}.ansibggray{background-color:gray}.output-error span{font-weight:400!important}.output-error pre{white-space:pre-wrap}.display_data .output_text pre,.execute_result .output_text pre{white-space:pre-wrap}input.raw_input{font-family:var(--colab-code-font-family);width:90%}input{background:var(--colab-primary-surface-color);border:1px solid var(--colab-bold-border-color);color:var(--colab-primary-text-color)}#output-area{display:flow-root}#output-area button.colab{background-color:var(--colab-secondary-surface-color);border:0;box-shadow:0 3px 4px 0 rgba(0,0,0,.14),0 1px 8px 0 rgba(0,0,0,.12),0 3px 3px -2px rgba(0,0,0,.4);color:var(--colab-primary-text-color);font-family:var(--colab-chrome-font-family);font-size:11px;margin:0 4px 10px;padding:6px;text-transform:uppercase;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}#output-area button.colab:hover{background-color:var(--colab-highlighted-surface-color);cursor:pointer}#output-area .output-error button.error-details{background-color:#42a5f5;color:#fff}#output-area .output-error button.error-details:hover{background-color:#2196f3}#output-area .stdin-widget{-webkit-box-align:center;-webkit-align-items:center;-moz-box-align:center;-ms-flex-align:center;align-items:center;display:inline;font-family:var(--colab-code-font-family);margin-right:10px;margin-top:10px;min-width:250px;padding:1px}#output-area .stdin-widget-hidden{visibility:hidden}.error .collapsed .extraneous{display:none}.error .error-expander{-webkit-box-align:center;-webkit-align-items:center;-moz-box-align:center;-ms-flex-align:center;align-items:center;cursor:pointer;display:-webkit-box;display:-webkit-flex;display:-moz-box;display:-ms-flexbox;display:flex}.error .error-expander hr{border:0;border-top:1px solid var(--colab-bold-border-color);-webkit-box-flex:1;-webkit-flex-grow:1;-moz-box-flex:1;-ms-flex-positive:1;flex-grow:1;height:1px;margin:0 10px;padding:0}.error .error-expander hr:first-child{max-width:240px}.error .error-expander svg{fill:var(--colab-icon-color);height:24px;stroke:var(--colab-icon-color);width:24px}.lm-Widget.lm-mod-hidden{display:none!important}audio:focus{outline:none}.string-repr{display:inline}.string-repr .quote{opacity:75%;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.string-repr pre{display:inline;white-space:pre-wrap;word-break:break-all}.string-repr button{color:var(--colab-primary-text-color);cursor:pointer;border:1px solid #767676;border-radius:2px;outline:none}.string-repr button.copy{background:transparent;border:none;margin-left:4px;opacity:0;padding:0;stroke:var(--colab-primary-text-color);-webkit-transition:opacity .2s;transition:opacity .2s}.string-repr button.copy svg{width:14px}.string-repr.hover button.copy,.string-repr:hover button.copy{opacity:1}.string-repr button.more{background-color:transparent;border-color:transparent;display:none;padding:0;-webkit-transition:background-color .2s,border-color .2s;transition:background-color .2s,border-color .2s}.string-repr.large button.more{display:inline}.string-repr.large.truncated button .collapse{display:none}.string-repr.large button .expand{display:none}.string-repr.large.truncated button .expand{display:inline}.string-repr.hover button.more,.string-repr:hover button.more{border-color:#767676}
+/*# sourceMappingURL=outputframe.css.map */
+//@ sourceURL=https://ssl.gstatic.com/colaboratory-static/common/a9ced4aed8e2fce0c836e00ae7f77be7/outputframe.css</style><!--<base href="https://localhost:8080/">--><base href="."></head><body><div id="output-area"><span id="output-header"> </span><div id="output-body"><div class="stream"><div class="output_subarea output_text"><pre>Requirement already satisfied: opencv-python-headless in /usr/local/lib/python3.11/dist-packages (4.11.0.86)
+Requirement already satisfied: tensorflow in /usr/local/lib/python3.11/dist-packages (2.18.0)
+Requirement already satisfied: matplotlib in /usr/local/lib/python3.11/dist-packages (3.10.0)
+Requirement already satisfied: numpy&gt;=1.21.2 in /usr/local/lib/python3.11/dist-packages (from opencv-python-headless) (2.0.2)
+Requirement already satisfied: absl-py&gt;=1.0.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (1.4.0)
+Requirement already satisfied: astunparse&gt;=1.6.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (1.6.3)
+Requirement already satisfied: flatbuffers&gt;=24.3.25 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (25.2.10)
+Requirement already satisfied: gast!=0.5.0,!=0.5.1,!=0.5.2,&gt;=0.2.1 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (0.6.0)
+Requirement already satisfied: google-pasta&gt;=0.1.1 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (0.2.0)
+Requirement already satisfied: libclang&gt;=13.0.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (18.1.1)
+Requirement already satisfied: opt-einsum&gt;=2.3.2 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (3.4.0)
+Requirement already satisfied: packaging in /usr/local/lib/python3.11/dist-packages (from tensorflow) (24.2)
+Requirement already satisfied: protobuf!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,&lt;6.0.0dev,&gt;=3.20.3 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (5.29.4)
+Requirement already satisfied: requests&lt;3,&gt;=2.21.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (2.32.3)
+Requirement already satisfied: setuptools in /usr/local/lib/python3.11/dist-packages (from tensorflow) (75.2.0)
+Requirement already satisfied: six&gt;=1.12.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (1.17.0)
+Requirement already satisfied: termcolor&gt;=1.1.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (3.1.0)
+Requirement already satisfied: typing-extensions&gt;=3.6.6 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (4.13.2)
+Requirement already satisfied: wrapt&gt;=1.11.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (1.17.2)
+Requirement already satisfied: grpcio&lt;2.0,&gt;=1.24.3 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (1.71.0)
+Requirement already satisfied: tensorboard&lt;2.19,&gt;=2.18 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (2.18.0)
+Requirement already satisfied: keras&gt;=3.5.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (3.8.0)
+Requirement already satisfied: h5py&gt;=3.11.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (3.13.0)
+Requirement already satisfied: ml-dtypes&lt;0.5.0,&gt;=0.4.0 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (0.4.1)
+Requirement already satisfied: tensorflow-io-gcs-filesystem&gt;=0.23.1 in /usr/local/lib/python3.11/dist-packages (from tensorflow) (0.37.1)
+Requirement already satisfied: contourpy&gt;=1.0.1 in /usr/local/lib/python3.11/dist-packages (from matplotlib) (1.3.2)
+Requirement already satisfied: cycler&gt;=0.10 in /usr/local/lib/python3.11/dist-packages (from matplotlib) (0.12.1)
+Requirement already satisfied: fonttools&gt;=4.22.0 in /usr/local/lib/python3.11/dist-packages (from matplotlib) (4.58.0)
+Requirement already satisfied: kiwisolver&gt;=1.3.1 in /usr/local/lib/python3.11/dist-packages (from matplotlib) (1.4.8)
+Requirement already satisfied: pillow&gt;=8 in /usr/local/lib/python3.11/dist-packages (from matplotlib) (11.2.1)
+Requirement already satisfied: pyparsing&gt;=2.3.1 in /usr/local/lib/python3.11/dist-packages (from matplotlib) (3.2.3)
+Requirement already satisfied: python-dateutil&gt;=2.7 in /usr/local/lib/python3.11/dist-packages (from matplotlib) (2.9.0.post0)
+Requirement already satisfied: wheel&lt;1.0,&gt;=0.23.0 in /usr/local/lib/python3.11/dist-packages (from astunparse&gt;=1.6.0-&gt;tensorflow) (0.45.1)
+Requirement already satisfied: rich in /usr/local/lib/python3.11/dist-packages (from keras&gt;=3.5.0-&gt;tensorflow) (13.9.4)
+Requirement already satisfied: namex in /usr/local/lib/python3.11/dist-packages (from keras&gt;=3.5.0-&gt;tensorflow) (0.0.9)
+Requirement already satisfied: optree in /usr/local/lib/python3.11/dist-packages (from keras&gt;=3.5.0-&gt;tensorflow) (0.15.0)
+Requirement already satisfied: charset-normalizer&lt;4,&gt;=2 in /usr/local/lib/python3.11/dist-packages (from requests&lt;3,&gt;=2.21.0-&gt;tensorflow) (3.4.2)
+Requirement already satisfied: idna&lt;4,&gt;=2.5 in /usr/local/lib/python3.11/dist-packages (from requests&lt;3,&gt;=2.21.0-&gt;tensorflow) (3.10)
+Requirement already satisfied: urllib3&lt;3,&gt;=1.21.1 in /usr/local/lib/python3.11/dist-packages (from requests&lt;3,&gt;=2.21.0-&gt;tensorflow) (2.4.0)
+Requirement already satisfied: certifi&gt;=2017.4.17 in /usr/local/lib/python3.11/dist-packages (from requests&lt;3,&gt;=2.21.0-&gt;tensorflow) (2025.4.26)
+Requirement already satisfied: markdown&gt;=2.6.8 in /usr/local/lib/python3.11/dist-packages (from tensorboard&lt;2.19,&gt;=2.18-&gt;tensorflow) (3.8)
+Requirement already satisfied: tensorboard-data-server&lt;0.8.0,&gt;=0.7.0 in /usr/local/lib/python3.11/dist-packages (from tensorboard&lt;2.19,&gt;=2.18-&gt;tensorflow) (0.7.2)
+Requirement already satisfied: werkzeug&gt;=1.0.1 in /usr/local/lib/python3.11/dist-packages (from tensorboard&lt;2.19,&gt;=2.18-&gt;tensorflow) (3.1.3)
+Requirement already satisfied: MarkupSafe&gt;=2.1.1 in /usr/local/lib/python3.11/dist-packages (from werkzeug&gt;=1.0.1-&gt;tensorboard&lt;2.19,&gt;=2.18-&gt;tensorflow) (3.0.2)
+Requirement already satisfied: markdown-it-py&gt;=2.2.0 in /usr/local/lib/python3.11/dist-packages (from rich-&gt;keras&gt;=3.5.0-&gt;tensorflow) (3.0.0)
+Requirement already satisfied: pygments&lt;3.0.0,&gt;=2.13.0 in /usr/local/lib/python3.11/dist-packages (from rich-&gt;keras&gt;=3.5.0-&gt;tensorflow) (2.19.1)
+Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.11/dist-packages (from markdown-it-py&gt;=2.2.0-&gt;rich-&gt;keras&gt;=3.5.0-&gt;tensorflow) (0.1.2)
+</pre></div></div><div class="display_data"><div class="output_subarea output_html rendered_html">
+     <input type="file" id="files-a90265a0-f29c-4963-a4e8-be0895d26cce" name="files[]" multiple="" disabled="" style="border:none">
+     <output id="result-a90265a0-f29c-4963-a4e8-be0895d26cce">
+      Upload widget is only available when the cell has been executed in the
+      current browser session. Please rerun this cell to enable.
+      </output>
+      <script type="">// Copyright 2017 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Helpers for google.colab Python module.
+ */
+(function(scope) {
+function span(text, styleAttributes = {}) {
+  const element = document.createElement('span');
+  element.textContent = text;
+  for (const key of Object.keys(styleAttributes)) {
+    element.style[key] = styleAttributes[key];
+  }
+  return element;
+}
+
+// Max number of bytes which will be uploaded at a time.
+const MAX_PAYLOAD_SIZE = 100 * 1024;
+
+function _uploadFiles(inputId, outputId) {
+  const steps = uploadFilesStep(inputId, outputId);
+  const outputElement = document.getElementById(outputId);
+  // Cache steps on the outputElement to make it available for the next call
+  // to uploadFilesContinue from Python.
+  outputElement.steps = steps;
+
+  return _uploadFilesContinue(outputId);
+}
+
+// This is roughly an async generator (not supported in the browser yet),
+// where there are multiple asynchronous steps and the Python side is going
+// to poll for completion of each step.
+// This uses a Promise to block the python side on completion of each step,
+// then passes the result of the previous step as the input to the next step.
+function _uploadFilesContinue(outputId) {
+  const outputElement = document.getElementById(outputId);
+  const steps = outputElement.steps;
+
+  const next = steps.next(outputElement.lastPromiseValue);
+  return Promise.resolve(next.value.promise).then((value) => {
+    // Cache the last promise value to make it available to the next
+    // step of the generator.
+    outputElement.lastPromiseValue = value;
+    return next.value.response;
+  });
+}
+
+/**
+ * Generator function which is called between each async step of the upload
+ * process.
+ * @param {string} inputId Element ID of the input file picker element.
+ * @param {string} outputId Element ID of the output display.
+ * @return {!Iterable<!Object>} Iterable of next steps.
+ */
+function* uploadFilesStep(inputId, outputId) {
+  const inputElement = document.getElementById(inputId);
+  inputElement.disabled = false;
+
+  const outputElement = document.getElementById(outputId);
+  outputElement.innerHTML = '';
+
+  const pickedPromise = new Promise((resolve) => {
+    inputElement.addEventListener('change', (e) => {
+      resolve(e.target.files);
+    });
+  });
+
+  const cancel = document.createElement('button');
+  inputElement.parentElement.appendChild(cancel);
+  cancel.textContent = 'Cancel upload';
+  const cancelPromise = new Promise((resolve) => {
+    cancel.onclick = () => {
+      resolve(null);
+    };
+  });
+
+  // Wait for the user to pick the files.
+  const files = yield {
+    promise: Promise.race([pickedPromise, cancelPromise]),
+    response: {
+      action: 'starting',
+    }
+  };
+
+  cancel.remove();
+
+  // Disable the input element since further picks are not allowed.
+  inputElement.disabled = true;
+
+  if (!files) {
+    return {
+      response: {
+        action: 'complete',
+      }
+    };
+  }
+
+  for (const file of files) {
+    const li = document.createElement('li');
+    li.append(span(file.name, {fontWeight: 'bold'}));
+    li.append(span(
+        `(${file.type || 'n/a'}) - ${file.size} bytes, ` +
+        `last modified: ${
+            file.lastModifiedDate ? file.lastModifiedDate.toLocaleDateString() :
+                                    'n/a'} - `));
+    const percent = span('0% done');
+    li.appendChild(percent);
+
+    outputElement.appendChild(li);
+
+    const fileDataPromise = new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        resolve(e.target.result);
+      };
+      reader.readAsArrayBuffer(file);
+    });
+    // Wait for the data to be ready.
+    let fileData = yield {
+      promise: fileDataPromise,
+      response: {
+        action: 'continue',
+      }
+    };
+
+    // Use a chunked sending to avoid message size limits. See b/62115660.
+    let position = 0;
+    do {
+      const length = Math.min(fileData.byteLength - position, MAX_PAYLOAD_SIZE);
+      const chunk = new Uint8Array(fileData, position, length);
+      position += length;
+
+      const base64 = btoa(String.fromCharCode.apply(null, chunk));
+      yield {
+        response: {
+          action: 'append',
+          file: file.name,
+          data: base64,
+        },
+      };
+
+      let percentDone = fileData.byteLength === 0 ?
+          100 :
+          Math.round((position / fileData.byteLength) * 100);
+      percent.textContent = `${percentDone}% done`;
+
+    } while (position < fileData.byteLength);
+  }
+
+  // All done.
+  yield {
+    response: {
+      action: 'complete',
+    }
+  };
+}
+
+scope.google = scope.google || {};
+scope.google.colab = scope.google.colab || {};
+scope.google.colab._files = {
+  _uploadFiles,
+  _uploadFilesContinue,
+};
+})(self);
+</script> </div></div><div class="error output-error"><div class="output_subarea output_text collapsed"><pre><span style="color: var(--ansi-red);">---------------------------------------------------------------------------</span>
+</pre><pre><span style="color: var(--ansi-red);">TypeError</span><span>                                 Traceback (most recent call last)</span>
+</pre><pre><span style="color: var(--ansi-green);">&lt;ipython-input-6-32344d4a8d9c&gt;</span><span> in </span><span style="color: var(--ansi-cyan);">&lt;cell line: 0&gt;</span><span style="color: var(--ansi-blue);">()</span><span>
+</span><span style="font-weight: bold; color: var(--ansi-green);">     62</span><span> </span><span>
+</span><span style="font-weight: bold; color: var(--ansi-green);">     63</span><span> </span><span style="color: var(--ansi-red);"># 파일 업로드 및 로드</span><span>
+</span><span style="color: var(--ansi-green);">---&gt; 64</span><span style="color: var(--ansi-red);"> </span><span>uploaded</span><span> </span><span style="color: var(--ansi-blue);">=</span><span> </span><span>files</span><span style="color: var(--ansi-blue);">.</span><span>upload</span><span style="color: var(--ansi-blue);">(</span><span style="color: var(--ansi-blue);">)</span><span>
+</span><span style="font-weight: bold; color: var(--ansi-green);">     65</span><span> </span><span>model_file</span><span> </span><span style="color: var(--ansi-blue);">=</span><span> </span><span style="color: var(--ansi-blue);">[</span><span>f</span><span> </span><span style="color: var(--ansi-green);">for</span><span> </span><span>f</span><span> </span><span style="color: var(--ansi-green);">in</span><span> </span><span>uploaded</span><span> </span><span style="color: var(--ansi-green);">if</span><span> </span><span>f</span><span style="color: var(--ansi-blue);">.</span><span>endswith</span><span style="color: var(--ansi-blue);">(</span><span style="color: var(--ansi-blue);">'.h5'</span><span style="color: var(--ansi-blue);">)</span><span style="color: var(--ansi-blue);">]</span><span style="color: var(--ansi-blue);">[</span><span style="color: var(--ansi-cyan);">0</span><span style="color: var(--ansi-blue);">]</span><span>
+</span><span style="font-weight: bold; color: var(--ansi-green);">     66</span><span> </span><span>labels_file</span><span> </span><span style="color: var(--ansi-blue);">=</span><span> </span><span style="color: var(--ansi-blue);">[</span><span>f</span><span> </span><span style="color: var(--ansi-green);">for</span><span> </span><span>f</span><span> </span><span style="color: var(--ansi-green);">in</span><span> </span><span>uploaded</span><span> </span><span style="color: var(--ansi-green);">if</span><span> </span><span>f</span><span style="color: var(--ansi-blue);">.</span><span>endswith</span><span style="color: var(--ansi-blue);">(</span><span style="color: var(--ansi-blue);">'.txt'</span><span style="color: var(--ansi-blue);">)</span><span style="color: var(--ansi-blue);">]</span><span style="color: var(--ansi-blue);">[</span><span style="color: var(--ansi-cyan);">0</span><span style="color: var(--ansi-blue);">]</span><span>
+</span>
+</pre><div class="error-expander"><hr><svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet"><path d="M12 5.83L15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9 12 5.83zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15 12 18.17z"></path></svg><span class="summary">1 frames</span><hr></div><pre class="extraneous"><span style="color: var(--ansi-green);">/usr/local/lib/python3.11/dist-packages/google/colab/files.py</span><span> in </span><span style="color: var(--ansi-cyan);">upload</span><span style="color: var(--ansi-blue);">(target_dir)</span><span>
+</span><span style="font-weight: bold; color: var(--ansi-green);">     70</span><span>   """
+</span><span style="font-weight: bold; color: var(--ansi-green);">     71</span><span> </span><span>
+</span><span style="color: var(--ansi-green);">---&gt; 72</span><span style="color: var(--ansi-red);">   </span><span>uploaded_files</span><span> </span><span style="color: var(--ansi-blue);">=</span><span> </span><span>_upload_files</span><span style="color: var(--ansi-blue);">(</span><span>multiple</span><span style="color: var(--ansi-blue);">=</span><span style="color: var(--ansi-green);">True</span><span style="color: var(--ansi-blue);">)</span><span>
+</span><span style="font-weight: bold; color: var(--ansi-green);">     73</span><span>   </span><span style="color: var(--ansi-red);"># Mapping from original filename to filename as saved locally.</span><span>
+</span><span style="font-weight: bold; color: var(--ansi-green);">     74</span><span>   </span><span>local_filenames</span><span> </span><span style="color: var(--ansi-blue);">=</span><span> </span><span>dict</span><span style="color: var(--ansi-blue);">(</span><span style="color: var(--ansi-blue);">)</span><span>
+</span>
+</pre><pre><span style="color: var(--ansi-green);">/usr/local/lib/python3.11/dist-packages/google/colab/files.py</span><span> in </span><span style="color: var(--ansi-cyan);">_upload_files</span><span style="color: var(--ansi-blue);">(multiple)</span><span>
+</span><span style="font-weight: bold; color: var(--ansi-green);">    169</span><span>   </span><span>files</span><span> </span><span style="color: var(--ansi-blue);">=</span><span> </span><span>_collections</span><span style="color: var(--ansi-blue);">.</span><span>defaultdict</span><span style="color: var(--ansi-blue);">(</span><span>bytes</span><span style="color: var(--ansi-blue);">)</span><span>
+</span><span style="font-weight: bold; color: var(--ansi-green);">    170</span><span> </span><span>
+</span><span style="color: var(--ansi-green);">--&gt; 171</span><span style="color: var(--ansi-red);">   </span><span style="color: var(--ansi-green);">while</span><span> </span><span>result</span><span style="color: var(--ansi-blue);">[</span><span style="color: var(--ansi-blue);">'action'</span><span style="color: var(--ansi-blue);">]</span><span> </span><span style="color: var(--ansi-blue);">!=</span><span> </span><span style="color: var(--ansi-blue);">'complete'</span><span style="color: var(--ansi-blue);">:</span><span>
+</span><span style="font-weight: bold; color: var(--ansi-green);">    172</span><span>     result = _output.eval_js(
+</span><span style="font-weight: bold; color: var(--ansi-green);">    173</span><span>         'google.colab._files._uploadFilesContinue("{output_id}")'.format(
+</span>
+</pre><pre><span style="color: var(--ansi-red);">TypeError</span><span>: 'NoneType' object is not subscriptable</span></pre></div><div style="padding-top: 20px;"></div></div></div><span id="output-footer"></span></div></body></html>
