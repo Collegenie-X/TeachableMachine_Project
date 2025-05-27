@@ -132,8 +132,19 @@ class WasteSortingGameManager:
             # 현재 프레임 처리
             processed_frame = preprocess_image(frame, self.image_size)
             
-            # 예측 수행
-            class_idx = self._process_prediction(processed_frame)
+            # 예측 수행 - 항상 실시간 예측 수행
+            class_idx, confidence, prediction = get_prediction(self.model, processed_frame)
+            
+            # 인식 결과 업데이트 (안전하게 인덱스 확인)
+            if 0 <= class_idx < len(self.class_names):
+                self.last_prediction = self.class_names[class_idx]
+            else:
+                # 인덱스가 범위를 벗어나면 첫 번째 클래스 사용
+                print(f"Warning: Class index {class_idx} out of range (max: {len(self.class_names)-1})")
+                class_idx = 0
+                self.last_prediction = self.class_names[0]
+            
+            self.current_confidence = confidence * 100
             
             # 현재 시간 가져오기
             current_time = time.time()
@@ -150,38 +161,6 @@ class WasteSortingGameManager:
             # 키 입력 처리
             if self._handle_key_input():
                 break  # ESC 키가 눌리면 종료
-    
-    def _process_prediction(self, processed_frame):
-        """
-        이미지에 대한 예측을 처리합니다.
-        
-        Args:
-            processed_frame (numpy.ndarray): 전처리된 프레임
-            
-        Returns:
-            int: 인식된 클래스 인덱스
-        """
-        try:
-            class_idx, confidence, prediction = get_prediction(self.model, processed_frame)
-            
-            # 인식 결과 업데이트 (안전하게 인덱스 확인)
-            if 0 <= class_idx < len(self.class_names):
-                self.last_prediction = self.class_names[class_idx]
-            else:
-                # 인덱스가 범위를 벗어나면 첫 번째 클래스 사용
-                print(f"Warning: Class index {class_idx} out of range (max: {len(self.class_names)-1})")
-                class_idx = 0
-                self.last_prediction = self.class_names[0]
-            
-            self.current_confidence = confidence * 100
-            return class_idx
-            
-        except Exception as e:
-            print(f"Prediction error: {e}")
-            # 오류 발생 시 기본값 설정
-            self.last_prediction = self.class_names[0] if self.class_names else "Unknown"
-            self.current_confidence = 50.0
-            return 0
     
     def _update_timing_and_state(self, current_time):
         """

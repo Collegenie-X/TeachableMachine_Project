@@ -18,6 +18,28 @@ from utils.image_processing import (
 )
 from utils.model_utils import get_waste_info
 
+def display_realtime_recognition(game_instance, frame):
+    """
+    항상 상단 오른쪽에 실시간 인식 정보를 표시합니다.
+    
+    Args:
+        game_instance: 게임 인스턴스
+        frame (numpy.ndarray): 현재 프레임
+    """
+    h, w, _ = frame.shape
+    
+    if game_instance.last_prediction:
+        # 텍스트 생성
+        recognition_text = f"Label: {game_instance.last_prediction} ({game_instance.current_confidence:.1f}%)"
+        
+        # 텍스트 크기 계산하여 오른쪽 정렬
+        text_size = cv2.getTextSize(recognition_text, cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)[0]
+        text_x = w - text_size[0] - 20  # 오른쪽 여백 20px
+        
+        # 배경과 함께 텍스트 표시
+        put_text_with_background(frame, recognition_text, (text_x, 30), 
+                             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+
 def handle_intro_state(game_instance, frame):
     """
     인트로 화면 상태를 처리합니다.
@@ -38,12 +60,7 @@ def handle_intro_state(game_instance, frame):
     cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
     
     # 상단 오른쪽에 인식된 라벨과 인식률 표시
-    if game_instance.last_prediction:
-        recognition_text = f"Label: {game_instance.last_prediction} ({game_instance.current_confidence:.1f}%)"
-        text_size = cv2.getTextSize(recognition_text, cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)[0]
-        text_x = w - text_size[0] - 20  # 오른쪽 여백 20px
-        put_text_with_background(frame, recognition_text, (text_x, 30), 
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+    display_realtime_recognition(game_instance, frame)
     
     # 게임 제목
     title_text = "Waste Recognition System"
@@ -125,12 +142,7 @@ def handle_playing_state(game_instance, frame, class_idx):
     h, w, _ = frame.shape
     
     # 상단 오른쪽에 인식된 라벨과 인식률 표시
-    if game_instance.last_prediction:
-        recognition_text = f"Label: {game_instance.last_prediction} ({game_instance.current_confidence:.1f}%)"
-        text_size = cv2.getTextSize(recognition_text, cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)[0]
-        text_x = w - text_size[0] - 20  # 오른쪽 여백 20px
-        put_text_with_background(frame, recognition_text, (text_x, 30), 
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+    display_realtime_recognition(game_instance, frame)
     
     # 현재 아이템 금액 표시
     current_value = 0
@@ -237,15 +249,17 @@ def handle_waiting_state(game_instance, frame):
     display_score(game_instance, frame)
     
     # 상단 오른쪽에 인식된 라벨과 인식률 표시
+    display_realtime_recognition(game_instance, frame)
+    
+    # 현재 시간
+    current_time = time.time()
+    
     if game_instance.current_item:
         recognition_text = f"Label: {game_instance.current_item} ({game_instance.current_confidence:.1f}%)"
         text_size = cv2.getTextSize(recognition_text, cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)[0]
         text_x = w - text_size[0] - 20  # 오른쪽 여백 20px
         put_text_with_background(frame, recognition_text, (text_x, 30), 
                                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
-    
-    # 현재 시간
-    current_time = time.time()
     
     # 인식 결과 표시
     result_text = f"Recognized: {game_instance.current_item}"
@@ -338,12 +352,7 @@ def handle_guide_state(game_instance, frame):
     display_score(game_instance, frame)
     
     # 상단 오른쪽에 인식된 라벨과 인식률 표시
-    if game_instance.current_guide_item:
-        recognition_text = f"Label: {game_instance.current_guide_item}"
-        text_size = cv2.getTextSize(recognition_text, cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)[0]
-        text_x = w - text_size[0] - 20  # 오른쪽 여백 20px
-        put_text_with_background(frame, recognition_text, (text_x, 30), 
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+    display_realtime_recognition(game_instance, frame)
     
     # 가이드 제목
     guide_title = f"{game_instance.current_guide_item} Recycling Guide"
@@ -503,13 +512,8 @@ def handle_game_end_state(game_instance, frame):
     alpha = 0.7
     cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
     
-    # 상단 오른쪽에 마지막 인식된 라벨과 인식률 표시 (있는 경우)
-    if game_instance.current_item:
-        recognition_text = f"Last: {game_instance.current_item}"
-        text_size = cv2.getTextSize(recognition_text, cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)[0]
-        text_x = w - text_size[0] - 20  # 오른쪽 여백 20px
-        put_text_with_background(frame, recognition_text, (text_x, 30), 
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+    # 상단 오른쪽에 인식된 라벨과 인식률 표시
+    display_realtime_recognition(game_instance, frame)
     
     # 게임 종료 메시지
     end_message = "Game Over! Thank you for playing!"
