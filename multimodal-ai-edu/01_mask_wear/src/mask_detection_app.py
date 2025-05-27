@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-마스크 착용 감지 애플리케이션
-실시간 웹캠 피드를 통해 마스크 착용 여부를 감지하고 경고를 표시합니다.
-Teachable Machine에서 생성된 모델(.h5)과 라벨(.txt)을 지원합니다.
+Mask Detection Application
+This application detects mask wearing through real-time webcam feed.
+Supports models (.h5) and labels (.txt) created from Teachable Machine.
 """
 
 import cv2
@@ -13,194 +13,268 @@ import tensorflow as tf
 import time
 import os
 import argparse
-import json
+import warnings
 
-# Google Drive 관련 라이브러리 (선택적)
-try:
-    from google.colab import drive
-    from google.colab import files
-    COLAB_ENV = True
-except ImportError:
-    COLAB_ENV = False
+# Filter warnings
+warnings.filterwarnings('ignore', category=UserWarning)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TensorFlow warnings (0=all, 1=INFO, 2=WARNING, 3=ERROR)
 
-# 인자 파싱
-parser = argparse.ArgumentParser(description='마스크 착용 감지 애플리케이션')
-parser.add_argument('--model', type=str, default='../models/model.h5',
-                    help='모델 파일 경로 (기본값: ../models/model.h5)')
-parser.add_argument('--labels', type=str, default='../models/labels.txt',
-                    help='라벨 파일 경로 (기본값: ../models/labels.txt)')
+# Fix for TensorFlow model loading issues
+# Custom object to fix the 'groups' parameter issue
+def _custom_layer_fix():
+    try:
+        from tensorflow.keras.layers import DepthwiseConv2D
+        # Save original from_config method
+        original_from_config = DepthwiseConv2D.from_config
+        
+        # Define new from_config method
+        @classmethod
+        def patched_from_config(cls, config):
+            # Remove groups parameter if present (without warning message)
+            if 'groups' in config:
+                config.pop('groups')
+            return original_from_config(config)
+        
+        # Apply method patch
+        DepthwiseConv2D.from_config = patched_from_config
+        print("Model compatibility patch applied.")
+    except Exception as e:
+        print(f"Failed to apply patch: {e}")
+
+# Apply Teachable Machine model compatibility patch
+_custom_layer_fix()
+
+# Parse arguments
+parser = argparse.ArgumentParser(description='Mask Detection Application')
+parser.add_argument('--model', type=str, default='../models/converted_keras/keras_model.h5',
+                    help='Model file path (default: ../models/converted_keras/keras_model.h5)')
+parser.add_argument('--labels', type=str, default='../models/converted_keras/labels.txt',
+                    help='Labels file path (default: ../models/converted_keras/labels.txt)')
 parser.add_argument('--camera', type=int, default=0,
-                    help='카메라 장치 번호 (기본값: 0)')
-parser.add_argument('--image_size', type=int, default=96,
-                    help='입력 이미지 크기 (기본값: 96)')
-parser.add_argument('--from_drive', action='store_true',
-                    help='Google Drive에서 모델을 로드합니다')
-parser.add_argument('--drive_model_path', type=str, 
-                    default='MyDrive/TeachableMachine/mask_model/model.h5',
-                    help='Google Drive 상의 모델 파일 경로')
-parser.add_argument('--drive_labels_path', type=str, 
-                    default='MyDrive/TeachableMachine/mask_model/labels.txt',
-                    help='Google Drive 상의 라벨 파일 경로')
+                    help='Camera device number (default: 0)')
+parser.add_argument('--image_size', type=int, default=224,
+                    help='Input image size (default: 224 - Teachable Machine default)')
+parser.add_argument('--quiet', action='store_true',
+                    help='Run with minimal output')
 args = parser.parse_args()
 
-# Google Drive에서 파일 로드 (Colab 환경인 경우)
-if args.from_drive and COLAB_ENV:
-    try:
-        print("Google Drive 마운트 중...")
-        drive.mount('/content/drive')
-        model_path = f"/content/drive/{args.drive_model_path}"
-        labels_path = f"/content/drive/{args.drive_labels_path}"
-        print(f"Drive에서 모델 로드: {model_path}")
-        print(f"Drive에서 라벨 로드: {labels_path}")
-    except Exception as e:
-        print(f"Google Drive 마운트 실패: {e}")
-        exit(1)
-else:
-    model_path = args.model
-    labels_path = args.labels
+model_path = args.model
+labels_path = args.labels
+verbose = not args.quiet
 
-# 얼굴 탐지를 위한 하르 캐스케이드 분류기 로드
+if verbose:
+    print(f"Model path: {model_path}")
+    print(f"Labels path: {labels_path}")
+
+# Load Haar Cascade classifier for face detection
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
-# 라벨 파일 로드
+# Load label file
 try:
     with open(labels_path, 'r') as f:
         class_names = [line.strip() for line in f.readlines()]
-    print(f"라벨 로드 성공: {class_names}")
+    if verbose:
+        print(f"Labels loaded successfully: {class_names}")
 except Exception as e:
-    print(f"라벨 파일 로드 실패: {e}")
-    print("기본 라벨을 사용합니다: ['마스크 착용', '마스크 미착용']")
-    class_names = ['마스크 착용', '마스크 미착용']
+    if verbose:
+        print(f"Failed to load labels file: {e}")
+        print("Using default labels: ['Mask', 'No Mask']")
+    class_names = ['Mask', 'No Mask']
 
-# 모델 로드
+# Load model
 try:
-    model = tf.keras.models.load_model(model_path)
-    print(f"모델 로드 성공: {model_path}")
-    model.summary()
+    # Register custom objects and load model in quiet mode
+    with tf.keras.utils.custom_object_scope({}):
+        # Load model with compile=False to avoid warning messages
+        model = tf.keras.models.load_model(model_path, compile=False)
+    if verbose:
+        print(f"Model loaded successfully: {model_path}")
+        # Show model summary (not in quiet mode)
+        if not args.quiet:
+            model.summary()
 except Exception as e:
-    print(f"모델 로드 실패: {e}")
-    print("훈련된 모델이 필요합니다. Teachable Machine에서 모델을 다운로드하세요.")
+    print(f"Failed to load model: {e}")
+    print("Trained model required. Download from Teachable Machine and save to models folder.")
     exit(1)
 
-# 웹캠 설정
+# Set up webcam
 cap = cv2.VideoCapture(args.camera)
 if not cap.isOpened():
-    print(f"카메라 {args.camera}를 열 수 없습니다.")
+    print(f"Cannot open camera {args.camera}.")
     exit(1)
 
-# 이미지 크기 설정
+# Image size setting
 IMG_SIZE = args.image_size
 
-# 상습 위반자 추적을 위한 데이터 구조
+# Data structure for tracking repeat offenders
 violation_counter = {}
-VIOLATION_THRESHOLD = 5  # 상습 위반자로 간주할 위반 횟수
+VIOLATION_THRESHOLD = 5  # Number of violations to consider as repeat offender
 
-# 이미지 전처리 함수
+# Store detected faces to reduce flickering
+previous_faces = []
+face_stability_frames = 10  # Number of frames to keep face detection stable
+
+# Image preprocessing function
 def preprocess_image(img):
-    # 이미지 크기 조정 및 정규화
+    # Resize and normalize image
     img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
     img = img / 255.0
     img = np.expand_dims(img, axis=0)
     return img
 
-# 메인 루프
-print("마스크 감지 시스템 시작. 'q'를 눌러 종료하세요.")
+# Function to add text with background
+def put_text_with_background(img, text, position, font, font_scale, text_color, thickness):
+    # Get text size
+    text_size, _ = cv2.getTextSize(text, font, font_scale, thickness)
+    text_w, text_h = text_size
+    
+    # Create background coordinates
+    x, y = position
+    background_rect = (x, y - text_h - 5, x + text_w + 10, y + 5)
+    
+    # Draw background rectangle (semi-transparent)
+    overlay = img.copy()
+    cv2.rectangle(overlay, (background_rect[0], background_rect[1]), 
+                 (background_rect[2], background_rect[3]), (0, 0, 0), -1)
+    
+    # Apply transparency
+    alpha = 0.7
+    cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0, img)
+    
+    # Put text on the background
+    cv2.putText(img, text, (x + 5, y - 5), font, font_scale, text_color, thickness)
+
+# Main loop
+print("Mask detection system started. Press 'q' to quit.")
 frame_count = 0
 last_violation_check = time.time()
 
 while True:
     ret, frame = cap.read()
     if not ret:
-        print("카메라에서 프레임을 받아올 수 없습니다.")
+        print("Cannot receive frame from camera.")
         break
     
-    # 화면 크기 조정
+    # Resize display
     frame = cv2.resize(frame, (640, 480))
     
-    # 얼굴 탐지 (5프레임마다 처리하여 성능 향상)
+    # Face detection (process every 5 frames for better performance)
     frame_count += 1
+    current_faces = []
+    
+    # Only run face detection every 5 frames
     if frame_count % 5 == 0:
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray, 1.1, 4)
-    
-        # 각 얼굴에 대해 마스크 착용 여부 예측
-        current_time = time.time()
-        for i, (x, y, w, h) in enumerate(faces):
-            # 얼굴 영역 추출
-            face_id = f"face_{i}"
-            face_img = frame[y:y+h, x:x+w]
-            
-            try:
-                # 예측을 위한 전처리
-                processed_face = preprocess_image(face_img)
-                
-                # 마스크 착용 여부 예측
-                prediction = model.predict(processed_face, verbose=0)
-                
-                # 예측 결과 및 신뢰도 추출
-                class_idx = np.argmax(prediction[0])
-                confidence = float(prediction[0][class_idx])
-                label = class_names[class_idx]
-                
-                # 결과 표시
-                if class_idx == 0:  # 마스크 착용 (첫 번째 클래스)
-                    color = (0, 255, 0)  # 초록색
-                    result_text = f"{label}: {confidence*100:.2f}%"
-                    # 위반 카운트 초기화
-                    if face_id in violation_counter:
-                        violation_counter[face_id] = 0
-                else:  # 마스크 미착용
-                    color = (0, 0, 255)  # 빨간색
-                    result_text = f"{label}: {confidence*100:.2f}%"
-                    
-                    # 위반 카운트 증가
-                    if face_id in violation_counter:
-                        violation_counter[face_id] += 1
-                    else:
-                        violation_counter[face_id] = 1
-                    
-                    # 경고 메시지
-                    cv2.putText(frame, "마스크를 착용해주세요!", (x, y-10),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
-                    
-                    # 상습 위반자 체크
-                    if violation_counter[face_id] >= VIOLATION_THRESHOLD:
-                        cv2.putText(frame, "상습 위반자!", (x, y-30),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
-                
-                # 얼굴 주위에 사각형 그리기
-                cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
-                
-                # 예측 결과 텍스트 표시
-                cv2.putText(frame, result_text, (x, y+h+20),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
-                    
-            except Exception as e:
-                print(f"예측 오류: {e}")
+        faces = face_cascade.detectMultiScale(gray, 1.1, 4, minSize=(50, 50))
         
-        # 오래된 얼굴 ID 제거 (30초마다)
-        if current_time - last_violation_check > 30:
-            violation_counter = {}
-            last_violation_check = current_time
+        if len(faces) > 0:
+            previous_faces = faces
+            current_faces = faces
+        else:
+            # Keep using previous faces if no new faces detected
+            if len(previous_faces) > 0:
+                current_faces = previous_faces
+    else:
+        # Use the previous_faces for stability between detection frames
+        if len(previous_faces) > 0:
+            current_faces = previous_faces
     
-    # 시스템 정보 표시
-    cv2.putText(frame, f"모델: {os.path.basename(model_path)}", 
-                (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-    cv2.putText(frame, f"해상도: {IMG_SIZE}x{IMG_SIZE}", 
-                (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+    # Predict mask wearing for each detected face
+    current_time = time.time()
+    for i, (x, y, w, h) in enumerate(current_faces):
+        # Extract face region
+        face_id = f"face_{i}"
+        face_img = frame[y:y+h, x:x+w]
+        
+        try:
+            # Preprocess for prediction
+            processed_face = preprocess_image(face_img)
+            
+            # Predict mask wearing (suppress warnings)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                prediction = model.predict(processed_face, verbose=0)
+            
+            # Extract prediction result and confidence
+            class_idx = np.argmax(prediction[0])
+            confidence = float(prediction[0][class_idx])
+            label = class_names[class_idx]
+            
+            # Check if the label contains "mask" or "Mask" (case insensitive)
+            is_wearing_mask = "mask" in label.lower() and not ("no" in label.lower() or "without" in label.lower())
+            
+            # Display result
+            if is_wearing_mask:  # Mask detected
+                color = (0, 255, 0)  # Green
+                result_text = f"{label}: {confidence*100:.2f}%"
+                # Reset violation counter
+                if face_id in violation_counter:
+                    violation_counter[face_id] = 0
+            else:  # No mask or other class
+                color = (0, 0, 255)  # Red
+                result_text = f"{label}: {confidence*100:.2f}%"
+                
+                # Increase violation counter
+                if face_id in violation_counter:
+                    violation_counter[face_id] += 1
+                else:
+                    violation_counter[face_id] = 1
+                
+                # Warning message with background
+                put_text_with_background(
+                    frame, "Please wear a mask!", (x, y-10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2
+                )
+                
+                # Repeat offender check
+                if violation_counter[face_id] >= VIOLATION_THRESHOLD:
+                    put_text_with_background(
+                        frame, "Repeat offender!", (x, y-40),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2
+                    )
+            
+            # Draw rectangle around face
+            cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
+            
+            # Display prediction result text with background
+            put_text_with_background(
+                frame, result_text, (x, y+h+20),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2
+            )
+                
+        except Exception as e:
+            if verbose:
+                print(f"Prediction error: {e}")
     
-    # 안내 메시지
-    cv2.putText(frame, "종료: 'q' 키", 
-                (20, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+    # Remove old face IDs (every 30 seconds)
+    if current_time - last_violation_check > 30:
+        violation_counter = {}
+        last_violation_check = current_time
     
-    # 결과 표시
-    cv2.imshow('마스크 착용 감지 시스템', frame)
+    # Display system info with background
+    put_text_with_background(
+        frame, f"Model: {os.path.basename(model_path)}", (20, 30),
+        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1
+    )
+    put_text_with_background(
+        frame, f"Resolution: {IMG_SIZE}x{IMG_SIZE}", (20, 50),
+        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1
+    )
     
-    # 'q' 키를 누르면 종료
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    # Instruction message with background
+    put_text_with_background(
+        frame, "Press 'q' to quit", (20, 70),
+        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1
+    )
+    
+    # Show result
+    cv2.imshow('Mask Detection System', frame)
+    
+    # Exit on 'q' key
+    if cv2.waitKey(1) & 0xFF == 27:
         break
 
-# 리소스 해제
+# Release resources
 cap.release()
 cv2.destroyAllWindows()
-print("마스크 감지 시스템 종료") 
+print("Mask detection system terminated") 

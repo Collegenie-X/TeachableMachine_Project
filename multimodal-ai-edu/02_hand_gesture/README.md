@@ -21,4 +21,3 @@
 
 3. 애플리케이션 실행
    - 게임 조작: `src/game_control.py` 실행
-   - 수어 번역: `src/sign_language_translator.py` 실행 
