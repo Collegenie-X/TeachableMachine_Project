@@ -1,2 +1,2 @@
-0 jongphil
-1 background
+0 no_mask
+1 mask

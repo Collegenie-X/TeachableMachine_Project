@@ -1,2 +1,4 @@
-0 jongphil
-1 background
+0 rock
+1 paper
+2 scissor
+3 background
